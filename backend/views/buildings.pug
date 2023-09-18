@@ -1,0 +1,40 @@
+doctype html
+html(lang="en")
+  head
+    title= pageTitle
+    script(type='text/javascript').
+      if (foo) bar(1 + 5);
+    link(rel="stylesheet" href="bootstrap.min.css")
+  body
+    nav.navbar.navbar-expand-lg.bg-light(data-bs-theme='light')
+      .container-fluid
+        a.navbar-brand(href='#') Historic Buildings of Spokane
+        button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarColor03', aria-controls='navbarColor03', aria-expanded='false', aria-label='Toggle navigation')
+          span.navbar-toggler-icon
+        #navbarColor03.collapse.navbar-collapse
+          ul.navbar-nav.me-auto
+            li.nav-item
+              a.nav-link.active(href='#')
+                | Home
+                span.visually-hidden (current)
+            li.nav-item
+              a.nav-link(href='#') Features
+            li.nav-item
+              a.nav-link(href='#') Pricing
+            li.nav-item
+              a.nav-link(href='#') About
+            li.nav-item.dropdown
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown', href='#', role='button', aria-haspopup='true', aria-expanded='false') Dropdown
+              .dropdown-menu
+                a.dropdown-item(href='#') Action
+                a.dropdown-item(href='#') Another action
+                a.dropdown-item(href='#') Something else here
+                .dropdown-divider
+                a.dropdown-item(href='#') Separated link
+          form.d-flex
+            input.form-control.me-sm-2(type='search', placeholder='Search')
+            button.btn.btn-secondary.my-2.my-sm-0(type='submit') Search
+    ul 
+      each building in buildings 
+        if building
+          li= building.name
