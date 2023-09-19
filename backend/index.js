@@ -16,34 +16,47 @@ app.listen(PORT, () => {
   console.log(`App is listening on port: ${PORT}`);
 });
 
-app.get('/profile/:buildingName', async (request, response) => {
-  const buildingName = request.params['buildingName'];
-  console.log(buildingName);
+app.get('/', async (request, response) => {
+  response.render('home');
+});
+
+app.get('/search', async (request, response) => {
+  const keyword = request.query.query;
+  console.log(keyword);
+  const sqlQuery = `SELECT * FROM spokane.buildings WHERE name LIKE '%${keyword}%';`
+  console.log(sqlQuery);
   try {
-    pool.query('SELECT * FROM buildings WHERE buildings.name = ?', [buildingName], (error, result) => {
+    pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error);
       }
-      response.render("profile", { building: result[0] });
+      response.render('search', { search_results: result });
     });
-  } catch(error) {
+  } catch (error) {
+    console.log(error);
+  }
+
+
+  
+});
+
+app.get('/profile/:buildingName', async (request, response) => {
+  const buildingName = request.params['buildingName'];
+  console.log(buildingName);
+  const sqlQuery = `
+    SELECT buildings.id, name, year_built, year_destroyed, url
+    FROM spokane.buildings INNER JOIN spokane.resources ON resources.building=buildings.name\
+    WHERE name = ?;`
+  try {
+    pool.query(sqlQuery, [buildingName], (error, result) => {
+      console.log(result);
+      response.render("profile", { building: result })
+    });
+  }
+  catch(error) {
     console.log(error);
   }
 });
-
-// app.get('/test', async (request, response) => {
-//   try {
-//     pool.query('SELECT * FROM buildings', (error, result) => {
-//       if (error) {
-//         console.log(error);
-//       }
-//       console.log(result[0]);
-//       response.render("test", { thing: result[0] });
-//     });
-//   } catch(error) {
-//     response.render("error");
-//   }
-// });
   
 app.get('/buildings', async (request, response) => {
   try {
