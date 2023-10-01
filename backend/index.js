@@ -62,6 +62,13 @@ app.get('/buildings', async (request, response) => {
       if (error) {
         return response.status(404).send({ message: error.message });
       }
+      result.sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+
+        return (nameA < nameB) ? -1 : 
+               (nameA > nameB) ? 1 : 0
+      });
       return response.render("buildings", {buildings: result});
     });
   } catch(error) {

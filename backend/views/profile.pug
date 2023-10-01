@@ -19,12 +19,16 @@ block content
     .container 
       .row 
         .col-6
-          section.splide(aria-label='Splide Basic HTML Example')
-            .splide__track
-              ul.splide__list
-                each image in building
-                  li.splide__slide.d-flex.justify-content-center
-                    img(src=image.url, style='height:500px;')
+          if building.length > 1
+            section.splide(aria-label='Splide Basic HTML Example')
+              .splide__track
+                ul.splide__list
+                  each image in building
+                    li.splide__slide.d-flex.justify-content-center
+                      img(src=image.url, style='max-height: 500px; max-width:100%')
+          else 
+            .d-flex.justify-content-center
+              img(src=building[0].url, style='max-height: 500px; max-width:100%')
   else 
     h1 Not found.
   
