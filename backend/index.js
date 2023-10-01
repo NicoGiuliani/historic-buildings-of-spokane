@@ -9,6 +9,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/node_modules', express.static('node_modules'));
 app.set("views", path.join(__dirname, 'views'));
 app.set("view engine", "pug");
 
@@ -35,9 +36,6 @@ app.get('/search', async (request, response) => {
   } catch (error) {
     console.log(error);
   }
-
-
-  
 });
 
 app.get('/profile/:buildingName', async (request, response) => {
@@ -45,7 +43,7 @@ app.get('/profile/:buildingName', async (request, response) => {
   console.log(buildingName);
   const sqlQuery = `
     SELECT buildings.id, name, year_built, year_destroyed, url
-    FROM spokane.buildings INNER JOIN spokane.resources ON resources.building=buildings.name\
+    FROM spokane.buildings INNER JOIN spokane.resources ON resources.building=buildings.name
     WHERE name = ?;`
   try {
     pool.query(sqlQuery, [buildingName], (error, result) => {
