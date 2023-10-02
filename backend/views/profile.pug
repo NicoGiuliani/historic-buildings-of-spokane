@@ -9,26 +9,39 @@ block content
       right: -50px;
     }
     .splide__pagination {
-      bottom: -20px;
+      bottom: -25px;
     }
     button.is-active {
       background-color: black !important;
     }
   if building.length > 0
-    h1 #{building[0].name}
     .container 
-      .row 
+      .row
         .col-6
           if building.length > 1
             section.splide(aria-label='Splide Basic HTML Example')
               .splide__track
-                ul.splide__list
-                  each image in building
-                    li.splide__slide.d-flex.justify-content-center
-                      img(src=image.url, style='max-height: 500px; max-width:100%')
+                ul.splide__list(style='max-height: 500px')
+                  each element in building
+                    li.splide__slide.d-flex.justify-content-center.flex-column
+                      img(src=element.url, style='max-height: 100%; max-width: 100%; object-fit: contain')
+                      if element.caption
+                        p #{element.caption}
           else 
             .d-flex.justify-content-center
-              img(src=building[0].url, style='max-height: 500px; max-width:100%')
+              img(src=building[0].url, style='max-height: 500px; max-width:100%; object-fit: contain')
+        .col-6.d-flex.flex-column.justify-content-between(style='padding-left: 55px')
+          if building.length > 0
+            h1 #{building[0].name}
+            h5 #{building[0].address}
+            h5 #{building[0].address_description}
+            if building[0].address || building[0].address_description
+              br 
+            h5 Built in #{building[0].year_built}
+            h5 Destroyed in #{building[0].year_destroyed}
+            if building[0].maps_link
+              br
+              iframe(src=building[0].maps_link, width='400', height='300', style='border:0;', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
   else 
     h1 Not found.
   

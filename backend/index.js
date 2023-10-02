@@ -42,7 +42,7 @@ app.get('/profile/:buildingName', async (request, response) => {
   const buildingName = request.params['buildingName'];
   console.log(buildingName);
   const sqlQuery = `
-    SELECT buildings.id, name, year_built, year_destroyed, url
+    SELECT buildings.id, name, year_built, year_destroyed, address, address_description, maps_link, url, caption
     FROM spokane.buildings INNER JOIN spokane.resources ON resources.building=buildings.name
     WHERE name = ?;`
   try {
