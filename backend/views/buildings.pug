@@ -4,7 +4,7 @@ block content
   table.table.table-hover
     thead
       tr
-        th(scope='col').d-flex.gap-2
+        th(scope='col')
           a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
           .dropdown-menu
             a.dropdown-item(href="/buildings/sortedByName/a-z") A-Z
@@ -23,7 +23,7 @@ block content
         th(scope='col') Address
         th(scope='col') Address Description
     each building in buildings 
-      - var url = 'profile/' + building.name
+      - var url = '/profile/' + building.name
       tr.table-secondary
         th(scope='row') 
           a(href=url) #{building.name}

@@ -24,14 +24,20 @@ app.get('/', async (request, response) => {
 app.get('/search', async (request, response) => {
   const keyword = request.query.query;
   console.log(keyword);
-  const sqlQuery = `SELECT * FROM spokane.buildings WHERE name LIKE '%${keyword}%';`
+  const sqlQuery = `
+    SELECT * FROM spokane.buildings 
+    WHERE name LIKE '%${keyword}%'
+    OR year_built LIKE '%${keyword}%'
+    OR year_destroyed LIKE '%${keyword}%'
+    OR address LIKE '%${keyword}%'
+    OR address_description LIKE '%${keyword}%';`
   console.log(sqlQuery);
   try {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error);
       }
-      response.render('search', { search_results: result });
+      response.render('buildings', { buildings: result });
     });
   } catch (error) {
     console.log(error);
