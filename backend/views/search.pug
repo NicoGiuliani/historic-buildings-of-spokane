@@ -2,7 +2,18 @@ extends layout.pug
 
 block content 
   h3 Results:
-  ul 
-    each result in search_results
-      li 
-        a(href=`/profile/${result.name}`) #{result.name}
+  table.table.table-hover
+    thead
+      tr
+        th(scope='col') Name
+        th(scope='col') Year Built
+        th(scope='col') Year Destroyed
+        th(scope='col') Address Description
+    each building in search_results 
+      - var url = '/profile/' + building.name
+      tr.table-secondary
+        th(scope='row') 
+          a(href=url) #{building.name}
+        td #{building.year_built}
+        td #{building.year_destroyed}
+        td #{building.address_description}

@@ -40,12 +40,10 @@ app.get('/search', async (request, response) => {
 
 app.get('/profile/:buildingName', async (request, response) => {
   const buildingName = request.params['buildingName'];
-  
   const buildingQuery = `
     SELECT buildings.id, name, year_built, year_destroyed, address, 
     address_description, description, maps_link
     FROM spokane.buildings WHERE name = ?;`
-
   const resourceQuery = `
     SELECT url, caption, image_index, year_taken FROM spokane.resources WHERE building = ?;`
 
@@ -73,26 +71,80 @@ app.get('/profile/:buildingName', async (request, response) => {
 
 });
   
-app.get('/buildings', async (request, response) => {
-  try {
-    const sqlQuery = 'SELECT * FROM buildings'
+app.get('/buildings/:column?/:method?', async (request, response) => {
+  const column = request.params['column'] ? request.params['column'] : null;
+  const method = request.params['method'] ? request.params['method'] : null;
+  let sqlQuery;
+  
+  if (column) {
+    switch (column) {
+      case ("sortedByName"):
+        if (method === "z-a") {
+          sqlQuery = `SELECT * FROM buildings ORDER BY name DESC;`
+        } else {
+          sqlQuery = `SELECT * FROM buildings ORDER BY name;`
+        }
+        break;
+      case ("sortedByYearBuilt"):
+        if (method === "most-recent") {
+          sqlQuery = `SELECT * FROM buildings ORDER BY year_built DESC;`
+        } else {
+          sqlQuery = `SELECT * FROM buildings ORDER BY year_built;`
+        }
+        break;
+      case ("sortedByYearDestroyed"):
+        if (method === "most-recent") {
+          sqlQuery = `SELECT * FROM buildings ORDER BY year_destroyed DESC;`
+        } else {
+          sqlQuery = `
+            SELECT * FROM buildings
+            ORDER BY
+              CASE
+                WHEN year_destroyed IS NULL THEN 1
+                    ELSE 0 
+              END,
+            year_destroyed ASC;`
+        }
+        break;
+      case ("stillStanding"):
+        sqlQuery = `SELECT * FROM buildings WHERE year_destroyed IS NULL ORDER BY name;`
+        break;
+      default:
+        break;
+    }
+  } else {
+    sqlQuery = `SELECT * FROM buildings ORDER BY name;`
+  }
+
+  const result = await new Promise((resolve, reject) => {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        return response.status(404).send({ message: error.message });
+        reject(error);
+      } else {
+        resolve(result);
       }
-      result.sort((a, b) => {
-        const nameA = a.name.toLowerCase();
-        const nameB = b.name.toLowerCase();
-
-        return (nameA < nameB) ? -1 : 
-               (nameA > nameB) ? 1 : 0
-      });
-      return response.render("buildings", {buildings: result});
     });
-  } catch(error) {
-    response.render('error');
-  }
+  })   
+
+  return response.render("buildings", {buildings: result});
 });
+
+app.get('/buildings/sortByYearBuilt', async (request, response) => {
+  const sqlQuery = `SELECT * FROM buildings ORDER BY year_built;`
+
+  const result = await new Promise((resolve, reject) => {
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+  })   
+
+  return response.render("buildings", {buildings: result});
+});
+
 
 app.post('/buildings', async (request, response) => {
   try {

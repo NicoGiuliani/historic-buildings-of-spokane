@@ -1,8 +1,27 @@
 extends layout.pug
 
 block content
-  h3.p-4 All buildings:
   table.table.table-hover
+    thead
+      tr
+        th(scope='col').d-flex.gap-2
+          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
+          .dropdown-menu
+            a.dropdown-item(href="/buildings/sortedByName/a-z") A-Z
+            a.dropdown-item(href="/buildings/sortedByName/z-a") Z-A
+        th(scope='col') 
+          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Built
+          .dropdown-menu
+            a.dropdown-item(href="/buildings/sortedByYearBuilt/most-recent") Most Recent
+            a.dropdown-item(href="/buildings/sortedByYearBuilt/oldest") Oldest
+        th(scope='col') 
+          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Destroyed
+          .dropdown-menu
+            a.dropdown-item(href="/buildings/sortedByYearDestroyed/most-recent") Most Recent
+            a.dropdown-item(href="/buildings/sortedByYearDestroyed/oldest") Oldest
+            a.dropdown-item(href="/buildings/stillStanding") Still Standing
+        th(scope='col') Address
+        th(scope='col') Address Description
     each building in buildings 
       - var url = 'profile/' + building.name
       tr.table-secondary
@@ -10,6 +29,7 @@ block content
           a(href=url) #{building.name}
         td #{building.year_built}
         td #{building.year_destroyed}
+        td #{building.address}
         td #{building.address_description}
-        //- td
+        //- td.d-flex.justify-content-center
         //-   img(src=building.url alt='Trulli' max-width='100%' height='80')
