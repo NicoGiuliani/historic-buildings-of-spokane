@@ -14,34 +14,46 @@ block content
     button.is-active {
       background-color: black !important;
     }
-  if building.length > 0
-    .container 
+  if building
+    .container.d-flex.flex-column.gap-5
       .row
         .col-6
-          if building.length > 1
+          if images.length > 1
             section.splide(aria-label='Splide Basic HTML Example')
               .splide__track
-                ul.splide__list(style='max-height: 500px')
-                  each element in building
-                    li.splide__slide.d-flex.justify-content-center.flex-column
-                      img(src=element.url, style='max-height: 100%; max-width: 100%; object-fit: contain')
-                      if element.caption
-                        p #{element.caption}
+                ul.splide__list
+                  each image in images
+                    li.splide__slide.d-flex.justify-content-center.align-items-center.flex-column
+                      a(href=image.url) 
+                        img(src=image.url, style='max-height: 500px; max-width: 100%; object-fit: contain')
+                      if image.caption
+                        p.m-0 #{image.caption} 
+                      if image.year_taken
+                        p.m-0 [#{image.year_taken}]
           else 
-            .d-flex.justify-content-center
-              img(src=building[0].url, style='max-height: 500px; max-width:100%; object-fit: contain')
+            .d-flex.justify-content-center.align-items-center.flex-column
+              a(href=image.url)
+                img(src=image.url, style='max-height: 500px; max-width:100%; object-fit: contain')
+              if image.caption
+                p.m-0 #{image.caption}
+              if building.year_taken 
+                p.m-0 [#{image.year_taken}]
         .col-6.d-flex.flex-column.justify-content-between(style='padding-left: 55px')
-          if building.length > 0
-            h1 #{building[0].name}
-            h5 #{building[0].address}
-            h5 #{building[0].address_description}
-            if building[0].address || building[0].address_description
+          if building
+            h1 #{building.name}
+            h5 #{building.address}
+            h5 #{building.address_description}
+            if building.address || building.address_description
               br 
-            h5 Built in #{building[0].year_built}
-            h5 Destroyed in #{building[0].year_destroyed}
-            if building[0].maps_link
+            h5 Built in #{building.year_built}
+            h5 Destroyed in #{building.year_destroyed}
+            if building.maps_link
               br
-              iframe(src=building[0].maps_link, width='400', height='300', style='border:0;', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
+              iframe(src=building.maps_link, width='400', height='300', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
+      .row 
+        hr
+        p Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquam qui laudantium accusamus saepe ex, laboriosam consectetur soluta suscipit dolores architecto nostrum porro id, ullam cum quo tenetur nobis est laborum delectus deserunt quod adipisci. Assumenda quia molestiae repudiandae quis aperiam odit iure in a nobis esse, provident cumque, delectus ipsam molestias. Fugiat, facilis laboriosam? Minus rerum sit ex iusto animi et voluptate quidem eum, consequuntur ab beatae dolor, aspernatur quasi, aliquam recusandae accusamus. Minus explicabo ipsa ex cum maiores ea ullam porro maxime nesciunt. Praesentium sit autem dolorum laboriosam harum ipsam at consequuntur dignissimos pariatur. Eum exercitationem eaque beatae veritatis nam distinctio laboriosam, debitis autem aut harum expedita fugiat sint, sed at ducimus voluptates impedit officiis voluptatum itaque recusandae quia ratione iusto dolorem? Quisquam delectus vero, beatae, officiis voluptatibus nostrum ratione aspernatur dolorum libero vel consequatur? Error, nisi doloribus. Ut distinctio repellat perspiciatis vero accusamus id tenetur sapiente eligendi, ipsa explicabo odio! Pariatur, itaque. Unde laboriosam at adipisci veritatis consequatur enim pariatur tempore ut error asperiores voluptas neque, natus aspernatur, nemo excepturi impedit, quia saepe expedita fugit. Ad sint ratione quidem possimus sequi est. Maiores ipsa dicta reiciendis voluptas voluptates repudiandae ea est nulla modi harum, magni iusto odit doloremque rerum excepturi temporibus labore. Assumenda esse tempora sequi recusandae maiores quos facilis aperiam, ut ipsam tempore, porro alias. Sint eos totam possimus labore quidem consequuntur, itaque est, fugiat explicabo sit vitae, ex dolore laudantium molestiae rerum cum animi distinctio tempora quos cupiditate eligendi asperiores illum? Odio animi sapiente quis. Excepturi dolores ducimus, pariatur facilis eos quos natus iste recusandae unde ipsa distinctio iusto sunt ratione quia, necessitatibus enim officiis voluptatem consectetur nam veniam! Assumenda explicabo nulla deserunt quisquam ipsam eos, similique sapiente eveniet officiis necessitatibus dolores iusto ab, ex consequatur aperiam dolorem culpa voluptatum quia. Ratione explicabo saepe labore molestias?
+        //- p #{building[0].description}
   else 
     h1 Not found.
   

@@ -40,25 +40,43 @@ app.get('/search', async (request, response) => {
 
 app.get('/profile/:buildingName', async (request, response) => {
   const buildingName = request.params['buildingName'];
-  console.log(buildingName);
-  const sqlQuery = `
-    SELECT buildings.id, name, year_built, year_destroyed, address, address_description, maps_link, url, caption
-    FROM spokane.buildings INNER JOIN spokane.resources ON resources.building=buildings.name
-    WHERE name = ?;`
-  try {
-    pool.query(sqlQuery, [buildingName], (error, result) => {
-      console.log(result);
-      response.render("profile", { building: result })
+  
+  const buildingQuery = `
+    SELECT buildings.id, name, year_built, year_destroyed, address, 
+    address_description, description, maps_link
+    FROM spokane.buildings WHERE name = ?;`
+
+  const resourceQuery = `
+    SELECT url, caption, image_index, year_taken FROM spokane.resources WHERE building = ?;`
+
+  const buildingResult = await new Promise((resolve, reject) => {
+    pool.query(buildingQuery, [buildingName], (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result[0]);
+      }
     });
-  }
-  catch(error) {
-    console.log(error);
-  }
+  })   
+  
+  const resourceResult = await new Promise((resolve, reject) => {
+    pool.query(resourceQuery, [buildingName], (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+  })  
+  
+  response.render("profile", { building: buildingResult, images: resourceResult });
+
 });
   
 app.get('/buildings', async (request, response) => {
   try {
-    pool.query('SELECT * FROM buildings', (error, result) => {
+    const sqlQuery = 'SELECT * FROM buildings'
+    pool.query(sqlQuery, (error, result) => {
       if (error) {
         return response.status(404).send({ message: error.message });
       }
