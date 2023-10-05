@@ -2,17 +2,11 @@ extends layout.pug
 
 block content
   - var currentYear = (new Date()).getFullYear()
+  - var url
   .row 
     .col-3
       .border
         .p-3
-          if message 
-            h5 #{message}
-          else
-            h5 Viewing all buildings
-          //- hr
-          //- a(href="/buildings") View all buildings
-          hr
           p View buildings in a specific year
           form.d-flex(action='/buildings/existingInYear', method='get')
             input.form-control.me-sm-2(type='number', name='query', placeholder='Year', max=currentYear)
@@ -26,17 +20,25 @@ block content
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search
           hr
-          p View buildings destroyed between 
+          p View buildings destroyed between
           form.d-flex(action='/buildings/destroyedBetween', method='get')
             input.form-control.me-sm-2(type='number', name='startYear', placeholder='Start', max=currentYear)
             input.form-control.me-sm-2(type='number', name='endYear', placeholder='End', max=currentYear)
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search
+          hr
+          - url = "/buildings/existingInYear?query=" + currentYear
+          a(href=url) Only show currently standing
+
           if message 
             hr
             a(href="/buildings") Clear filters
 
     .col-9
+      if message 
+        h4 #{message}
+      else
+        h4 Viewing all buildings
       table.table.table-hover
         thead
           tr

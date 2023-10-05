@@ -24,7 +24,7 @@ app.get('/', async (request, response) => {
 app.get('/search', async (request, response) => {
   const keyword = request.query.query;
   console.log(keyword);
-  const message = "Results for '" + keyword + "'"
+  const message = 'Results for "' + keyword + '"'
   const sqlQuery = `
     SELECT * FROM spokane.buildings 
     WHERE name LIKE '%${keyword}%'
@@ -85,11 +85,12 @@ app.get('/profile/:buildingName', async (request, response) => {
 app.get('/buildings/:filter?/:method?', async (request, response) => {
   const filter = request.params['filter'] ? request.params['filter'] : null;
   const method = request.params['method'] ? request.params['method'] : null;
+  let keyword;
   let sqlQuery;
   let startYear;
   let endYear;
   let message;
-  
+
   if (filter) {
     switch (filter) {
       case ("sortedByName"):
@@ -120,12 +121,10 @@ app.get('/buildings/:filter?/:method?', async (request, response) => {
             year_destroyed ASC;`
         }
         break;
-      case ("stillStanding"):
-        sqlQuery = `SELECT * FROM buildings WHERE year_destroyed IS NULL ORDER BY name;`
-        break;
       case ("existingInYear"):
-        const keyword = request.query.query;
-        message = "Viewing buildings in " + keyword;
+        keyword = request.query.query;
+        console.log(request.query);
+        message = "Viewing buildings standing in " + keyword;
         
         sqlQuery = 
           `SELECT * FROM spokane.buildings 
@@ -156,6 +155,7 @@ app.get('/buildings/:filter?/:method?', async (request, response) => {
       default:
         break;
     }
+
   } else {
     sqlQuery = `SELECT * FROM buildings ORDER BY name;`
   }
@@ -172,23 +172,6 @@ app.get('/buildings/:filter?/:method?', async (request, response) => {
 
   return response.render("buildings", {buildings: result, message: message});
 });
-
-app.get('/buildings/sortByYearBuilt', async (request, response) => {
-  const sqlQuery = `SELECT * FROM buildings ORDER BY year_built;`
-
-  const result = await new Promise((resolve, reject) => {
-    pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
-      }
-    });
-  })   
-
-  return response.render("buildings", {buildings: result});
-});
-
 
 app.post('/buildings', async (request, response) => {
   try {
