@@ -24,6 +24,7 @@ app.get('/', async (request, response) => {
 app.get('/search', async (request, response) => {
   const keyword = request.query.query;
   console.log(keyword);
+  const message = "Results for '" + keyword + "'"
   const sqlQuery = `
     SELECT * FROM spokane.buildings 
     WHERE name LIKE '%${keyword}%'
@@ -37,11 +38,15 @@ app.get('/search', async (request, response) => {
       if (error) {
         console.log(error);
       }
-      response.render('buildings', { buildings: result });
+      response.render('buildings', { buildings: result, message: message });
     });
   } catch (error) {
     console.log(error);
   }
+});
+
+app.get('/advancedSearch', async (request, response) => {
+    response.render('advancedSearch');
 });
 
 app.get('/profile/:buildingName', async (request, response) => {
@@ -77,13 +82,16 @@ app.get('/profile/:buildingName', async (request, response) => {
 
 });
   
-app.get('/buildings/:column?/:method?', async (request, response) => {
-  const column = request.params['column'] ? request.params['column'] : null;
+app.get('/buildings/:filter?/:method?', async (request, response) => {
+  const filter = request.params['filter'] ? request.params['filter'] : null;
   const method = request.params['method'] ? request.params['method'] : null;
   let sqlQuery;
+  let startYear;
+  let endYear;
+  let message;
   
-  if (column) {
-    switch (column) {
+  if (filter) {
+    switch (filter) {
       case ("sortedByName"):
         if (method === "z-a") {
           sqlQuery = `SELECT * FROM buildings ORDER BY name DESC;`
@@ -102,8 +110,8 @@ app.get('/buildings/:column?/:method?', async (request, response) => {
         if (method === "most-recent") {
           sqlQuery = `SELECT * FROM buildings ORDER BY year_destroyed DESC;`
         } else {
-          sqlQuery = `
-            SELECT * FROM buildings
+          sqlQuery =
+            `SELECT * FROM buildings
             ORDER BY
               CASE
                 WHEN year_destroyed IS NULL THEN 1
@@ -114,6 +122,36 @@ app.get('/buildings/:column?/:method?', async (request, response) => {
         break;
       case ("stillStanding"):
         sqlQuery = `SELECT * FROM buildings WHERE year_destroyed IS NULL ORDER BY name;`
+        break;
+      case ("existingInYear"):
+        const keyword = request.query.query;
+        message = "Viewing buildings in " + keyword;
+        
+        sqlQuery = 
+          `SELECT * FROM spokane.buildings 
+          WHERE ${keyword} >= year_built 
+          AND (${keyword} <= year_destroyed 
+          OR year_destroyed IS NULL);`
+        break;
+      case ("builtBetween"):
+        startYear = request.query.startYear;
+        endYear = request.query.endYear;
+        message = "Viewing buildings built between " + startYear + " & " + endYear;
+        
+        sqlQuery = 
+          `SELECT * FROM spokane.buildings 
+          WHERE ${startYear} <= year_built 
+          AND ${endYear} >= year_built;`
+        break;
+      case ("destroyedBetween"):
+        startYear = request.query.startYear;
+        endYear = request.query.endYear;
+        message = "Viewing buildings destroyed between " + startYear + " & " + endYear;
+        
+        sqlQuery = 
+          `SELECT * FROM spokane.buildings 
+          WHERE ${startYear} <= year_destroyed 
+          AND ${endYear} >= year_destroyed;`
         break;
       default:
         break;
@@ -132,7 +170,7 @@ app.get('/buildings/:column?/:method?', async (request, response) => {
     });
   })   
 
-  return response.render("buildings", {buildings: result});
+  return response.render("buildings", {buildings: result, message: message});
 });
 
 app.get('/buildings/sortByYearBuilt', async (request, response) => {

@@ -1,35 +1,71 @@
 extends layout.pug
 
 block content
-  table.table.table-hover
-    thead
-      tr
-        th(scope='col')
-          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
-          .dropdown-menu
-            a.dropdown-item(href="/buildings/sortedByName/a-z") A-Z
-            a.dropdown-item(href="/buildings/sortedByName/z-a") Z-A
-        th(scope='col') 
-          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Built
-          .dropdown-menu
-            a.dropdown-item(href="/buildings/sortedByYearBuilt/most-recent") Most Recent
-            a.dropdown-item(href="/buildings/sortedByYearBuilt/oldest") Oldest
-        th(scope='col') 
-          a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Destroyed
-          .dropdown-menu
-            a.dropdown-item(href="/buildings/sortedByYearDestroyed/most-recent") Most Recent
-            a.dropdown-item(href="/buildings/sortedByYearDestroyed/oldest") Oldest
-            a.dropdown-item(href="/buildings/stillStanding") Still Standing
-        th(scope='col') Address
-        th(scope='col') Address Description
-    each building in buildings 
-      - var url = '/profile/' + building.name
-      tr.table-secondary
-        th(scope='row') 
-          a(href=url) #{building.name}
-        td #{building.year_built}
-        td #{building.year_destroyed}
-        td #{building.address}
-        td #{building.address_description}
-        //- td.d-flex.justify-content-center
-        //-   img(src=building.url alt='Trulli' max-width='100%' height='80')
+  - var currentYear = (new Date()).getFullYear()
+  .row 
+    .col-3
+      .border
+        .p-3
+          if message 
+            h5 #{message}
+          else
+            h5 Viewing all buildings
+          //- hr
+          //- a(href="/buildings") View all buildings
+          hr
+          p View buildings in a specific year
+          form.d-flex(action='/buildings/existingInYear', method='get')
+            input.form-control.me-sm-2(type='number', name='query', placeholder='Year', max=currentYear)
+            button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
+              i.fas.fa-search
+          hr
+          p View buildings built between 
+          form.d-flex(action='/buildings/builtBetween', method='get')
+            input.form-control.me-sm-2(type='number', name='startYear', placeholder='Start', max=currentYear)
+            input.form-control.me-sm-2(type='number', name='endYear', placeholder='End', max=currentYear)
+            button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
+              i.fas.fa-search
+          hr
+          p View buildings destroyed between 
+          form.d-flex(action='/buildings/destroyedBetween', method='get')
+            input.form-control.me-sm-2(type='number', name='startYear', placeholder='Start', max=currentYear)
+            input.form-control.me-sm-2(type='number', name='endYear', placeholder='End', max=currentYear)
+            button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
+              i.fas.fa-search
+          if message 
+            hr
+            a(href="/buildings") Clear filters
+
+    .col-9
+      table.table.table-hover
+        thead
+          tr
+            th(scope='col')
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
+              .dropdown-menu
+                a.dropdown-item(href="/buildings/sortedByName/a-z") A-Z
+                a.dropdown-item(href="/buildings/sortedByName/z-a") Z-A
+            th(scope='col') 
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Built
+              .dropdown-menu
+                a.dropdown-item(href="/buildings/sortedByYearBuilt/most-recent") Most Recent
+                a.dropdown-item(href="/buildings/sortedByYearBuilt/oldest") Oldest
+            th(scope='col') 
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Destroyed
+              .dropdown-menu
+                a.dropdown-item(href="/buildings/sortedByYearDestroyed/most-recent") Most Recent
+                a.dropdown-item(href="/buildings/sortedByYearDestroyed/oldest") Oldest
+                a.dropdown-item(href="/buildings/stillStanding") Still Standing
+            th(scope='col') Address
+            th(scope='col') Address Description
+        each building in buildings 
+          - var url = '/profile/' + building.name
+          tr.table-secondary
+            th(scope='row') 
+              a(href=url) #{building.name}
+            td #{building.year_built}
+            td #{building.year_destroyed}
+            td #{building.address}
+            td #{building.address_description}
+            //- td.d-flex.justify-content-center
+            //-   img(src=building.url alt='Trulli' max-width='100%' height='80')

@@ -1,0 +1,11 @@
+extends layout.pug 
+
+block content
+  .d-flex.justify-content-center.align-items-center.pt-3
+    div(style="width: fit-content;")
+      p Search buildings that were standing in a specific year
+      form.d-flex(action='/buildings/existingInYear', method='get')
+        - var currentYear = (new Date()).getFullYear()
+        input.form-control.me-sm-2(type='number', name='query', placeholder='Enter a year', max=currentYear)
+        button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
+          i.fas.fa-search
