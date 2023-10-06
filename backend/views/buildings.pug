@@ -15,15 +15,15 @@ block content
           hr
           p View buildings built between 
           form.d-flex(action='/buildings/builtBetween', method='get')
-            input.form-control.me-sm-2(type='number', name='startYear', placeholder='Start', max=currentYear)
-            input.form-control.me-sm-2(type='number', name='endYear', placeholder='End', max=currentYear)
+            input.form-control.me-sm-2(type='number', required, name='startYear', placeholder='Start', max=currentYear)
+            input.form-control.me-sm-2(type='number', required, name='endYear', placeholder='End', max=currentYear)
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search
           hr
           p View buildings destroyed between
           form.d-flex(action='/buildings/destroyedBetween', method='get')
-            input.form-control.me-sm-2(type='number', name='startYear', placeholder='Start', max=currentYear)
-            input.form-control.me-sm-2(type='number', name='endYear', placeholder='End', max=currentYear)
+            input.form-control.me-sm-2(type='number', required, name='startYear', placeholder='Start', max=currentYear)
+            input.form-control.me-sm-2(type='number', required, name='endYear', placeholder='End', max=currentYear)
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search
           hr
@@ -37,7 +37,9 @@ block content
     .col-9
       if message 
         h4 #{message}
-      else
+      else if secondQuery
+        h4 Viewing buildings standing in #{secondQuery}
+      else 
         h4 Viewing all buildings
       table.table.table-hover
         thead
@@ -45,19 +47,24 @@ block content
             th(scope='col')
               a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
               .dropdown-menu
-                a.dropdown-item(href="/buildings/sortedByName/a-z") A-Z
-                a.dropdown-item(href="/buildings/sortedByName/z-a") Z-A
+                - url = previousFilter ? "/buildings/sortedByName/a-z/" + previousFilter : "/buildings/sortedByName/a-z/"
+                a.dropdown-item(href=url) A-Z
+                - url = previousFilter ? "/buildings/sortedByName/z-a/" + previousFilter : "/buildings/sortedByName/z-a/"
+                a.dropdown-item(href=url) Z-A
             th(scope='col') 
               a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Built
               .dropdown-menu
-                a.dropdown-item(href="/buildings/sortedByYearBuilt/most-recent") Most Recent
-                a.dropdown-item(href="/buildings/sortedByYearBuilt/oldest") Oldest
+                - url = previousFilter ? "/buildings/sortedByYearBuilt/most-recent/" + previousFilter : "/buildings/sortedByYearBuilt/most-recent/"
+                a.dropdown-item(href=url) Most Recent
+                - url = previousFilter ? "/buildings/sortedByYearBuilt/oldest/" + previousFilter : "/buildings/sortedByYearBuilt/oldest/"
+                a.dropdown-item(href=url) Oldest
             th(scope='col') 
               a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Destroyed
               .dropdown-menu
-                a.dropdown-item(href="/buildings/sortedByYearDestroyed/most-recent") Most Recent
-                a.dropdown-item(href="/buildings/sortedByYearDestroyed/oldest") Oldest
-                a.dropdown-item(href="/buildings/stillStanding") Still Standing
+                - url = previousFilter ? "/buildings/sortedByYearDestroyed/most-recent/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
+                a.dropdown-item(href=url) Most Recent
+                - url = previousFilter ? "/buildings/sortedByYearDestroyed/oldest/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
+                a.dropdown-item(href=url) Oldest
             th(scope='col') Address
             th(scope='col') Address Description
         each building in buildings 

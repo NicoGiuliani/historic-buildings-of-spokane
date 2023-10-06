@@ -24,29 +24,27 @@ app.get('/', async (request, response) => {
 app.get('/search', async (request, response) => {
   const keyword = request.query.query;
   console.log(keyword);
-  const message = 'Results for "' + keyword + '"'
-  const sqlQuery = `
-    SELECT * FROM spokane.buildings 
+  let message = 'Results for "' + keyword + '"'
+  const sqlQuery = 
+    `SELECT * FROM spokane.buildings 
     WHERE name LIKE '%${keyword}%'
     OR year_built LIKE '%${keyword}%'
     OR year_destroyed LIKE '%${keyword}%'
     OR address LIKE '%${keyword}%'
     OR address_description LIKE '%${keyword}%';`
-  console.log(sqlQuery);
   try {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error);
       }
-      response.render('buildings', { buildings: result, message: message });
+      let previousFilter = request.url.split('/')[1];
+      console.log("previousFilter:", previousFilter)
+
+      response.render('buildings', { buildings: result, message: message, previousFilter: previousFilter });
     });
   } catch (error) {
     console.log(error);
   }
-});
-
-app.get('/advancedSearch', async (request, response) => {
-    response.render('advancedSearch');
 });
 
 app.get('/profile/:buildingName', async (request, response) => {
@@ -82,7 +80,7 @@ app.get('/profile/:buildingName', async (request, response) => {
 
 });
   
-app.get('/buildings/:filter?/:method?', async (request, response) => {
+app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response) => {
   const filter = request.params['filter'] ? request.params['filter'] : null;
   const method = request.params['method'] ? request.params['method'] : null;
   let keyword;
@@ -90,40 +88,99 @@ app.get('/buildings/:filter?/:method?', async (request, response) => {
   let startYear;
   let endYear;
   let message;
+  let previousFilter;
+  let filterName;
+  let secondQuery;
 
   if (filter) {
     switch (filter) {
       case ("sortedByName"):
-        if (method === "z-a") {
-          sqlQuery = `SELECT * FROM buildings ORDER BY name DESC;`
-        } else {
-          sqlQuery = `SELECT * FROM buildings ORDER BY name;`
+        sqlQuery = `SELECT * FROM buildings `
+        if ('secondFilter' in request.params) {
+          previousFilter = request.url.split('/')[4];
+          filterName = previousFilter.split('?')[0];
+          if (filterName === 'existingInYear') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
+          }
+          else if (filterName === 'search') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            console.log(sqlQuery);
+            sqlQuery += 
+              `WHERE name LIKE '%${secondQuery}%'
+              OR year_built LIKE '%${secondQuery}%'
+              OR year_destroyed LIKE '%${secondQuery}%'
+              OR address LIKE '%${secondQuery}%'
+              OR address_description LIKE '%${secondQuery}%' `
+            }
+            message = 'Results for "' + secondQuery + '"'
         }
+        if (method === "z-a") {
+          sqlQuery += `ORDER BY name DESC;`
+        } else {
+          sqlQuery += `ORDER BY name ASC;`
+        }
+        console.log(sqlQuery);
         break;
       case ("sortedByYearBuilt"):
+        sqlQuery = `SELECT * FROM buildings `
+        if ('secondFilter' in request.params) {
+          previousFilter = request.url.split('/')[4];
+          filterName = previousFilter.split('?')[0];
+          if (filterName === 'existingInYear') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
+          }
+          else if (filterName === 'search') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            console.log(sqlQuery);
+            sqlQuery += 
+              `WHERE name LIKE '%${secondQuery}%'
+              OR year_built LIKE '%${secondQuery}%'
+              OR year_destroyed LIKE '%${secondQuery}%'
+              OR address LIKE '%${secondQuery}%'
+              OR address_description LIKE '%${secondQuery}%' `
+            }
+            message = 'Results for "' + secondQuery + '"'
+        }
         if (method === "most-recent") {
-          sqlQuery = `SELECT * FROM buildings ORDER BY year_built DESC;`
+          sqlQuery += `ORDER BY year_built DESC;`
         } else {
-          sqlQuery = `SELECT * FROM buildings ORDER BY year_built;`
+          sqlQuery += `ORDER BY year_built ASC;`
         }
         break;
       case ("sortedByYearDestroyed"):
-        if (method === "most-recent") {
-          sqlQuery = `SELECT * FROM buildings ORDER BY year_destroyed DESC;`
-        } else {
-          sqlQuery =
-            `SELECT * FROM buildings
-            ORDER BY
-              CASE
-                WHEN year_destroyed IS NULL THEN 1
-                    ELSE 0 
-              END,
-            year_destroyed ASC;`
+        sqlQuery = `SELECT * FROM buildings `
+        if ('secondFilter' in request.params) {
+          previousFilter = request.url.split('/')[4];
+          filterName = previousFilter.split('?')[0];
+          if (filterName === 'existingInYear') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
+          }
+          else if (filterName === 'search') {
+            secondQuery = previousFilter.split('?')[1].split('=')[1];
+            sqlQuery += 
+            `WHERE name LIKE '%${secondQuery}%'
+            OR year_built LIKE '%${secondQuery}%'
+            OR year_destroyed LIKE '%${secondQuery}%'
+            OR address LIKE '%${secondQuery}%'
+            OR address_description LIKE '%${secondQuery}%' `
+          }
+          message = 'Results for "' + secondQuery + '"'
         }
+        if (method === "most-recent") {
+          sqlQuery += 
+          `ORDER BY CASE WHEN year_destroyed IS NULL THEN 1 ELSE 0 END, year_destroyed DESC;`
+        } else {
+          sqlQuery += `ORDER BY CASE WHEN year_destroyed IS NULL THEN 1 ELSE 0 END, year_destroyed ASC;`
+        }
+        console.log(sqlQuery);
         break;
       case ("existingInYear"):
         keyword = request.query.query;
-        console.log(request.query);
+        previousFilter = request.url.split('/')[2];
+        console.log("previousFilter:", previousFilter)
         message = "Viewing buildings standing in " + keyword;
         
         sqlQuery = 
@@ -170,7 +227,9 @@ app.get('/buildings/:filter?/:method?', async (request, response) => {
     });
   })   
 
-  return response.render("buildings", {buildings: result, message: message});
+  console.log("secondQuery:", secondQuery);
+
+  return response.render("buildings", {buildings: result, message: message, previousFilter: previousFilter, secondQuery: secondQuery});
 });
 
 app.post('/buildings', async (request, response) => {
