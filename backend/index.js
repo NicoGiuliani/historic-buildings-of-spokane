@@ -92,29 +92,56 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
   let filterName;
   let secondQuery;
 
+  const applySecondFilter = () => {
+    previousFilter = request.url.split('/')[4];
+    filterName = previousFilter.split('?')[0];
+
+    if (filterName === 'existingInYear') {
+      secondQuery = previousFilter.split('?')[1].split('=')[1];
+      sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
+      message = "Viewing buildings standing in " + secondQuery
+    }
+    else if (filterName === 'search') {
+      secondQuery = previousFilter.split('?')[1].split('=')[1];
+      console.log(sqlQuery);
+      sqlQuery += 
+        `WHERE name LIKE '%${secondQuery}%'
+        OR year_built LIKE '%${secondQuery}%'
+        OR year_destroyed LIKE '%${secondQuery}%'
+        OR address LIKE '%${secondQuery}%'
+        OR address_description LIKE '%${secondQuery}%' `
+      message = 'Results for "' + secondQuery + '"'
+    }
+    else if (filterName === 'builtBetween') {
+      secondQuery = previousFilter.split('?')[1];
+      startYear = secondQuery.split('&')[0].split('=')[1];
+      endYear = secondQuery.split('&')[1].split('=')[1];
+      sqlQuery += 
+        `WHERE year_built >= ${startYear} AND year_built <= ${endYear} `
+      message = "Viewing buildings built between " + startYear + " & " + endYear
+    }
+    else if (filterName === 'destroyedBetween') {
+      secondQuery = previousFilter.split('?')[1];
+      startYear = secondQuery.split('&')[0].split('=')[1];
+      endYear = secondQuery.split('&')[1].split('=')[1];
+      sqlQuery += 
+        `WHERE year_destroyed >= ${startYear} AND year_destroyed <= ${endYear} `
+      message = "Viewing buildings destroyed between " + startYear + " & " + endYear
+    }
+    else {
+      console.log("An error has occurred in applySecondFilter");
+    }
+  }
+  
   if (filter) {
     switch (filter) {
       case ("sortedByName"):
         sqlQuery = `SELECT * FROM buildings `
+
         if ('secondFilter' in request.params) {
-          previousFilter = request.url.split('/')[4];
-          filterName = previousFilter.split('?')[0];
-          if (filterName === 'existingInYear') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
-          }
-          else if (filterName === 'search') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            console.log(sqlQuery);
-            sqlQuery += 
-              `WHERE name LIKE '%${secondQuery}%'
-              OR year_built LIKE '%${secondQuery}%'
-              OR year_destroyed LIKE '%${secondQuery}%'
-              OR address LIKE '%${secondQuery}%'
-              OR address_description LIKE '%${secondQuery}%' `
-            }
-            message = 'Results for "' + secondQuery + '"'
+          applySecondFilter();
         }
+
         if (method === "z-a") {
           sqlQuery += `ORDER BY name DESC;`
         } else {
@@ -125,23 +152,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
       case ("sortedByYearBuilt"):
         sqlQuery = `SELECT * FROM buildings `
         if ('secondFilter' in request.params) {
-          previousFilter = request.url.split('/')[4];
-          filterName = previousFilter.split('?')[0];
-          if (filterName === 'existingInYear') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
-          }
-          else if (filterName === 'search') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            console.log(sqlQuery);
-            sqlQuery += 
-              `WHERE name LIKE '%${secondQuery}%'
-              OR year_built LIKE '%${secondQuery}%'
-              OR year_destroyed LIKE '%${secondQuery}%'
-              OR address LIKE '%${secondQuery}%'
-              OR address_description LIKE '%${secondQuery}%' `
-            }
-            message = 'Results for "' + secondQuery + '"'
+          applySecondFilter();
         }
         if (method === "most-recent") {
           sqlQuery += `ORDER BY year_built DESC;`
@@ -152,22 +163,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
       case ("sortedByYearDestroyed"):
         sqlQuery = `SELECT * FROM buildings `
         if ('secondFilter' in request.params) {
-          previousFilter = request.url.split('/')[4];
-          filterName = previousFilter.split('?')[0];
-          if (filterName === 'existingInYear') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            sqlQuery += `WHERE year_built <= ${secondQuery} AND (year_destroyed >= ${secondQuery} OR year_destroyed IS NULL) `
-          }
-          else if (filterName === 'search') {
-            secondQuery = previousFilter.split('?')[1].split('=')[1];
-            sqlQuery += 
-            `WHERE name LIKE '%${secondQuery}%'
-            OR year_built LIKE '%${secondQuery}%'
-            OR year_destroyed LIKE '%${secondQuery}%'
-            OR address LIKE '%${secondQuery}%'
-            OR address_description LIKE '%${secondQuery}%' `
-          }
-          message = 'Results for "' + secondQuery + '"'
+          applySecondFilter();
         }
         if (method === "most-recent") {
           sqlQuery += 
@@ -190,6 +186,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
           OR year_destroyed IS NULL);`
         break;
       case ("builtBetween"):
+        previousFilter = request.url.split('/')[2];
         startYear = request.query.startYear;
         endYear = request.query.endYear;
         message = "Viewing buildings built between " + startYear + " & " + endYear;
@@ -200,6 +197,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
           AND ${endYear} >= year_built;`
         break;
       case ("destroyedBetween"):
+        previousFilter = request.url.split('/')[2];
         startYear = request.query.startYear;
         endYear = request.query.endYear;
         message = "Viewing buildings destroyed between " + startYear + " & " + endYear;
@@ -226,8 +224,6 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
       }
     });
   })   
-
-  console.log("secondQuery:", secondQuery);
 
   return response.render("buildings", {buildings: result, message: message, previousFilter: previousFilter, secondQuery: secondQuery});
 });

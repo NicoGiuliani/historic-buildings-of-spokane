@@ -44,29 +44,29 @@ block content
       table.table.table-hover
         thead
           tr
-            th(scope='col')
+            th(scope='col').col-3
               a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Name
               .dropdown-menu
                 - url = previousFilter ? "/buildings/sortedByName/a-z/" + previousFilter : "/buildings/sortedByName/a-z/"
                 a.dropdown-item(href=url) A-Z
                 - url = previousFilter ? "/buildings/sortedByName/z-a/" + previousFilter : "/buildings/sortedByName/z-a/"
                 a.dropdown-item(href=url) Z-A
-            th(scope='col') 
-              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Built
+            th(scope='col').col-1
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Built
               .dropdown-menu
                 - url = previousFilter ? "/buildings/sortedByYearBuilt/most-recent/" + previousFilter : "/buildings/sortedByYearBuilt/most-recent/"
                 a.dropdown-item(href=url) Most Recent
                 - url = previousFilter ? "/buildings/sortedByYearBuilt/oldest/" + previousFilter : "/buildings/sortedByYearBuilt/oldest/"
                 a.dropdown-item(href=url) Oldest
-            th(scope='col') 
-              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Year Destroyed
+            th(scope='col').col-1
+              a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') Destroyed
               .dropdown-menu
                 - url = previousFilter ? "/buildings/sortedByYearDestroyed/most-recent/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
                 a.dropdown-item(href=url) Most Recent
                 - url = previousFilter ? "/buildings/sortedByYearDestroyed/oldest/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
                 a.dropdown-item(href=url) Oldest
-            th(scope='col') Address
-            th(scope='col') Address Description
+            th(scope='col').col-3 Address
+            th(scope='col').col-4 Address Description
         each building in buildings 
           - var url = '/profile/' + building.name
           tr.table-secondary
