@@ -21,11 +21,13 @@ html(lang="en")
           input.form-control.me-sm-2(type='search', name='query', placeholder='Search')
           button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
             i.fas.fa-search
-  .mt-3.mx-4
+  .my-3.mx-4
     block content
+  .d-flex.justify-content-center.align-items-center(style="position: static; bottom: 0;")
+    h5 Copyright © 2023 Nico Julian
   script(src="/node_modules/@splidejs/splide/dist/js/splide.min.js")
   script. 
-    new Splide( '.splide', {
+    new Splide( '#mainSplide', {
       type      : 'loop',
       gap       : '50px',
     }).mount();

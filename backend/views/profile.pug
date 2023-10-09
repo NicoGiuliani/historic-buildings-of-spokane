@@ -3,10 +3,10 @@ extends layout.pug
 block content
   style. 
     @media screen and (min-width: 992px) {
-      .splide__arrow--prev {
+      #mainSplide .splide__arrow--prev {
         left: -50px;
       }
-      .splide__arrow--next {
+      #mainSplide .splide__arrow--next {
         right: -50px;
       }
       .second-column {
@@ -24,8 +24,8 @@ block content
       }
     }
     @media screen and (max-width: 992px) {
-      .splide__arrow--prev,
-      .splide__arrow--next {
+      #mainSplide .splide__arrow--prev,
+      #mainSplide .splide__arrow--next {
         display: none;
       }
       .splide__slide img,
@@ -34,12 +34,6 @@ block content
         max-width: 100%;
         object-fit: contain;
       }
-      //- iframe {
-      //-   pointer-events: none;
-      //- }
-      //- .first-column {
-      //-   margin-bottom: 100px;
-      //- }
     }
     .first-column {
       min-height: 35vh;
@@ -51,33 +45,35 @@ block content
       background-color: black !important;
     }
     .splide__pagination {
-      bottom: -35px;
+      position: relative;
     }
     
   if building
-    .container-lg.d-flex.flex-column.gap-5
+    .container-lg.d-flex.flex-column.gap-3
       .row.d-flex
         .col-lg-6.col-12.first-column
           if images.length > 1
-            section.splide(aria-label='Splide Basic HTML Example')
+            section#mainSplide.splide(aria-label='Splide Basic HTML Example')
               .splide__track
                 ul.splide__list
                   each image in images
-                    li.splide__slide.d-flex.justify-content-center.align-items-center.flex-column
+                    li.splide__slide.d-flex.justify-content-center.align-items-center.flex-column.gap-2
                       a.w-100(href=image.url) 
                         img.w-100(src=image.url)
-                      if image.caption
-                        p.m-0 #{image.caption} 
-                      if image.year_taken
-                        p.m-0 [#{image.year_taken}]
+                      .mb-3.d-flex.justify-content-center.align-items-center.flex-column
+                        if image.caption
+                          span(style="text-align: justify") #{image.caption}
+                        if image.year_taken 
+                          span.mx-auto #{image.year_taken}
           else if images.length == 1
             .d-flex.justify-content-center.align-items-center.flex-column.individual-img
               a(href=images[0].url)
                 img.individual_img(src=images[0].url)
-              if images[0].caption
-                p.m-0 #{images[0].caption}
-              if images[0].year_taken 
-                p.m-0 [#{images[0].year_taken}]
+              .my-2.d-flex.justify-content-center.align-items-center.flex-column
+                if images[0].caption
+                  span(style="text-align: justify") #{images[0].caption}
+                if images[0].year_taken 
+                  span.mx-auto #{images[0].year_taken}
           else 
             div.h-100.border.d-flex.justify-content-center.align-items-center 
               span No image available
@@ -95,11 +91,25 @@ block content
             if building.maps_link
               br
               iframe.map(src=building.maps_link, width='100%', height='100%', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
-      .row 
+      if building.description
         hr
-        if building.description
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo quia earum praesentium consectetur quis beatae obcaecati, mollitia rerum pariatur perspiciatis asperiores ipsa eveniet dolorem nesciunt, vitae dicta soluta quae tempora maxime delectus fugit totam odio iusto! Delectus ipsum, voluptas molestiae unde, excepturi non harum corrupti error accusantium quas inventore culpa placeat nostrum quaerat debitis nihil voluptatibus esse sit dicta! Alias neque, qui minus deserunt laboriosam vero quo iusto nemo officia reiciendis, praesentium ratione nostrum inventore vitae adipisci aspernatur sequi iure facilis fugiat dignissimos repellendus quisquam, dicta nobis. Unde assumenda et accusantium eius, saepe vero asperiores? Quos mollitia vero consequatur delectus id unde iusto aperiam voluptas dolore animi. Iure, aliquam? Nihil ipsam sit, dolorem distinctio culpa veritatis in corporis dignissimos aut asperiores quod excepturi praesentium nisi non mollitia accusamus illo iusto incidunt hic cupiditate obcaecati sed facere? Aliquid nobis hic molestiae veniam, eveniet quo quidem cum dignissimos aut repudiandae voluptas, aspernatur eius culpa placeat rerum debitis aliquam, eum sint adipisci! Laudantium saepe quas doloribus iste amet voluptates beatae odio facilis ullam soluta ipsum totam, voluptatum deserunt blanditiis nesciunt nihil. Voluptatibus iusto exercitationem commodi laudantium repellat, ex deserunt velit optio itaque laborum accusantium natus tenetur maxime quaerat officiis sunt quae! Error reprehenderit iusto consequuntur laborum nisi harum deleniti quasi placeat dolorum ratione officia fuga, minima eaque! Debitis odio facilis harum quam velit molestiae at ab dolore exercitationem nostrum, perferendis quasi odit rerum accusamus tempore eaque, tempora libero minus eos itaque. Voluptate hic debitis velit alias odit. Odit iste sint eum consequuntur porro!
-          //- p #{building.description}
+        .row.d-flex
+          div !{building.description}
+      hr
+      h5.ps-4 Sources used on this page
+      - var className
+      #accordionExample.accordion.mb-5
+        each resource_array, source in resources
+          .accordion-item
+            h2#headingOne.accordion-header
+              - className = source.split(' ').join('_')
+              button.accordion-button.collapsed(type='button' data-bs-toggle='collapse' data-bs-target=`#collapse${className}` aria-expanded='false' aria-controls=`collapse${className}`)
+                | #{source}
+            .accordion-collapse.collapse(id=`collapse${className}` aria-labelledby='headingOne' data-bs-parent='#accordionExample')
+              .accordion-body
+                ul.m-0
+                each item in resource_array
+                  li #{item.source} 
+  
   else 
     h1 Not found.
-  

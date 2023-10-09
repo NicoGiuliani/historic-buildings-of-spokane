@@ -23,7 +23,6 @@ app.get('/', async (request, response) => {
 
 app.get('/search', async (request, response) => {
   const keyword = request.query.query;
-  console.log(keyword);
   let message = 'Results for "' + keyword + '"'
   const sqlQuery = 
     `SELECT * FROM spokane.buildings 
@@ -31,15 +30,14 @@ app.get('/search', async (request, response) => {
     OR year_built LIKE '%${keyword}%'
     OR year_destroyed LIKE '%${keyword}%'
     OR address LIKE '%${keyword}%'
-    OR address_description LIKE '%${keyword}%';`
+    OR address_description LIKE '%${keyword}%'
+    ORDER BY name;`
   try {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error);
       }
       let previousFilter = request.url.split('/')[1];
-      console.log("previousFilter:", previousFilter)
-
       response.render('buildings', { buildings: result, message: message, previousFilter: previousFilter });
     });
   } catch (error) {
@@ -54,8 +52,7 @@ app.get('/profile/:buildingName', async (request, response) => {
     address_description, description, maps_link
     FROM spokane.buildings WHERE name = ?;`
   const resourceQuery = `
-    SELECT url, caption, image_index, year_taken FROM spokane.resources WHERE building = ?;`
-
+    SELECT url, caption, image_index, year_taken, source, source_name FROM spokane.resources WHERE building = ?;`
   const buildingResult = await new Promise((resolve, reject) => {
     pool.query(buildingQuery, [buildingName], (error, result) => {
       if (error) {
@@ -74,10 +71,21 @@ app.get('/profile/:buildingName', async (request, response) => {
         resolve(result);
       }
     });
-  })  
-  
-  response.render("profile", { building: buildingResult, images: resourceResult });
+  })
 
+  let resources = {};
+  resourceResult.forEach(resource => {
+    if (!(resource.source_name in resources)) {
+      resources[resource.source_name] = [resource];
+    } else {
+      resources[resource.source_name].push(resource);
+    }
+  })
+
+
+  console.log("sources:", resources);
+  
+  response.render("profile", { building: buildingResult, images: resourceResult, resources: resources });
 });
   
 app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response) => {
@@ -103,7 +111,6 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
     }
     else if (filterName === 'search') {
       secondQuery = previousFilter.split('?')[1].split('=')[1];
-      console.log(sqlQuery);
       sqlQuery += 
         `WHERE name LIKE '%${secondQuery}%'
         OR year_built LIKE '%${secondQuery}%'
@@ -137,17 +144,14 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
     switch (filter) {
       case ("sortedByName"):
         sqlQuery = `SELECT * FROM buildings `
-
         if ('secondFilter' in request.params) {
           applySecondFilter();
         }
-
         if (method === "z-a") {
           sqlQuery += `ORDER BY name DESC;`
         } else {
           sqlQuery += `ORDER BY name ASC;`
         }
-        console.log(sqlQuery);
         break;
       case ("sortedByYearBuilt"):
         sqlQuery = `SELECT * FROM buildings `
@@ -171,46 +175,43 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         } else {
           sqlQuery += `ORDER BY CASE WHEN year_destroyed IS NULL THEN 1 ELSE 0 END, year_destroyed ASC;`
         }
-        console.log(sqlQuery);
         break;
       case ("existingInYear"):
         keyword = request.query.query;
         previousFilter = request.url.split('/')[2];
-        console.log("previousFilter:", previousFilter)
         message = "Viewing buildings standing in " + keyword;
-        
         sqlQuery = 
           `SELECT * FROM spokane.buildings 
           WHERE ${keyword} >= year_built 
           AND (${keyword} <= year_destroyed 
-          OR year_destroyed IS NULL);`
+          OR year_destroyed IS NULL) 
+          ORDER BY name;`
         break;
       case ("builtBetween"):
         previousFilter = request.url.split('/')[2];
         startYear = request.query.startYear;
         endYear = request.query.endYear;
         message = "Viewing buildings built between " + startYear + " & " + endYear;
-        
         sqlQuery = 
           `SELECT * FROM spokane.buildings 
           WHERE ${startYear} <= year_built 
-          AND ${endYear} >= year_built;`
+          AND ${endYear} >= year_built
+          ORDER BY name;`
         break;
       case ("destroyedBetween"):
         previousFilter = request.url.split('/')[2];
         startYear = request.query.startYear;
         endYear = request.query.endYear;
         message = "Viewing buildings destroyed between " + startYear + " & " + endYear;
-        
         sqlQuery = 
           `SELECT * FROM spokane.buildings 
           WHERE ${startYear} <= year_destroyed 
-          AND ${endYear} >= year_destroyed;`
+          AND ${endYear} >= year_destroyed
+          ORDER BY name;`
         break;
       default:
         break;
     }
-
   } else {
     sqlQuery = `SELECT * FROM buildings ORDER BY name;`
   }
