@@ -81,8 +81,8 @@ block content
           if building
             .info
               h1 #{building.name}
-              h5 #{building.address}
               h5 #{building.address_description}
+              h5 #{building.address}
               if building.address || building.address_description
                 br 
               h5 Built in #{building.year_built}
@@ -91,6 +91,23 @@ block content
             if building.maps_link
               br
               iframe.map(src=building.maps_link, width='100%', height='100%', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
+      hr
+      - var preceded_by = building.preceded_by ? building.preceded_by : null
+      - var succeeded_by = building.succeeded_by ? building.succeeded_by : null 
+      .d-flex.justify-content-between
+        .col-6
+          h5.text-center Preceded by 
+            if preceded_by !== null
+              a(href=`/profile/${preceded_by}`) #{preceded_by}
+            else 
+              | ???
+        .col-6
+          h5.text-center Succeeded by 
+            if succeeded_by !== null
+              a(href=`/profile/${succeeded_by}`) #{succeeded_by}
+            else 
+              | ???
+
       if building.description
         hr
         .row.d-flex
@@ -109,7 +126,9 @@ block content
               .accordion-body
                 ul.m-0
                 each item in resource_array
-                  li #{item.source} 
+                  - var title = item.title ? item.title : item.source
+                  li 
+                    a(href=item.source) #{title}
   
   else 
     h1 Not found.
