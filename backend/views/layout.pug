@@ -1,3 +1,10 @@
+style. 
+  @media screen and (max-width: 992px) {
+    * {
+      font-size: 1.4rem !important;
+    }
+  }
+
 doctype html
 html(lang="en")
   head
@@ -8,16 +15,16 @@ html(lang="en")
     script(src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css")
   body.d-flex.flex-column(style="min-height: 100vh")
-    nav.navbar.navbar-expand-lg.bg-light(data-bs-theme='light')
-      .container-fluid
+    nav.navbar.navbar-expand-lg.bg-light(data-bs-theme='light').py-lg-0
+      .container-fluid.px-4
         a.navbar-brand(href='/') Historic Buildings of Spokane
         button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarColor03', aria-controls='navbarColor03', aria-expanded='false', aria-label='Toggle navigation')
           span.navbar-toggler-icon
         #navbarColor03.collapse.navbar-collapse
-          ul.navbar-nav.me-auto
-            li.nav-item
+          ul.navbar-nav.me-auto.px-4
+            li.nav-item.my-3
               a.nav-link(href='/buildings') Buildings
-          form.d-flex(action='/search', method='get')
+          form.d-flex.my-auto(action='/search', method='get')
             input.form-control.me-sm-2(type='search', name='query', placeholder='Search')
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search

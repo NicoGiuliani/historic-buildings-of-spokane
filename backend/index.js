@@ -52,9 +52,10 @@ app.get('/profile/:buildingName', async (request, response) => {
     address_description, description, maps_link, preceded_by, succeeded_by
     FROM spokane.buildings WHERE name = ?;`
   const resourceQuery = `
-    SELECT url, caption, image_index, year_taken, source, source_name FROM spokane.resources WHERE building = ?;`
+    SELECT url, caption, image_index, year_taken, source, source_name FROM spokane.resources WHERE building = ? ORDER BY image_index;`
   const newspaperQuery = `
     SELECT date, source, source_name, title FROM spokane.newspapers WHERE building = ?;`
+    
   const buildingResult = await new Promise((resolve, reject) => {
     pool.query(buildingQuery, [buildingName], (error, result) => {
       if (error) {
@@ -93,6 +94,7 @@ app.get('/profile/:buildingName', async (request, response) => {
       resources[resource.source_name].push(resource);
     }
   })
+
   newspaperResult.forEach(newspaper => {
     if (!(newspaper.source_name in resources)) {
       resources[newspaper.source_name] = [newspaper];
@@ -100,8 +102,6 @@ app.get('/profile/:buildingName', async (request, response) => {
       resources[newspaper.source_name].push(newspaper);
     }
   })
-
-  console.log("sources:", resources);
   
   response.render("profile", { building: buildingResult, images: resourceResult, resources: resources });
 });
