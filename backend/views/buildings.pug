@@ -1,35 +1,36 @@
 extends layout.pug
 
+mixin filterSubmitButton 
+  button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
+    i.fas.fa-arrow-right
+
+mixin startYearEndYearInputs 
+  input.form-control.me-sm-2(type='number', required, name='startYear', placeholder='Start', max=currentYear)
+  input.form-control.me-sm-2(type='number', required, name='endYear', placeholder='End', max=currentYear)
+
 mixin filterBlock 
   p Search by keyword
   form.d-flex.my-auto(action='/search', method='get')
     input.form-control.me-sm-2(type='search', name='query', placeholder='Search')
-    button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
-      i.fas.fa-arrow-right
+    +filterSubmitButton
   hr
   p View buildings in a specific year
   form.d-flex(action='/buildings/existingInYear', method='get')
     input.form-control.me-sm-2(type='number', name='query', placeholder='Year', max=currentYear)
-    button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
-      i.fas.fa-arrow-right
+    +filterSubmitButton
   hr
   p View buildings built between 
   form.d-flex(action='/buildings/builtBetween', method='get')
-    input.form-control.me-sm-2(type='number', required, name='startYear', placeholder='Start', max=currentYear)
-    input.form-control.me-sm-2(type='number', required, name='endYear', placeholder='End', max=currentYear)
-    button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
-      i.fas.fa-arrow-right
+    +startYearEndYearInputs
+    +filterSubmitButton
   hr
   p View buildings destroyed between
   form.d-flex(action='/buildings/destroyedBetween', method='get')
-    input.form-control.me-sm-2(type='number', required, name='startYear', placeholder='Start', max=currentYear)
-    input.form-control.me-sm-2(type='number', required, name='endYear', placeholder='End', max=currentYear)
-    button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
-      i.fas.fa-arrow-right
+    +startYearEndYearInputs
+    +filterSubmitButton
   hr
   - url = "/buildings/existingInYear?query=" + currentYear
   a(href=url) Show buildings in the current year
-
   if message 
     hr
     a(href="/buildings") Clear filters
@@ -37,49 +38,48 @@ mixin filterBlock
 block content
   script. 
     document.addEventListener("DOMContentLoaded", () => { 
-      let showFilters = true;
       const button  = document.getElementById('toggleButton');
       const h5 = button.querySelector('h5');
       button.addEventListener("click", function(event) {
         h5.innerText = h5.textContent !== "Hide filters" ? "Hide filters" : "Show filters";
       })
     });
+
   style.
-    .onlyOnMobile {
+    .display-lg-none {
       display: none;
     }
     @media screen and (max-width: 992px) {
-      .hideOnMobile {
+      .display-lg-none {
+        display: initial;
+      }
+      .display-lg-block {
         display: none;
       }
-      .onlyOnMobile {
-        display: inline-block;
-      }
-      th, 
-      td {
+      th, td {
         padding: 1rem !important;
       }
       table * {
         font-size: 1rem !important;
       }
     }
+
   - var currentYear = (new Date()).getFullYear()
   - var url
 
   .mx-4.my-lg-4
     .row
-      nav.navbar.onlyOnMobile.my-2
+      nav.navbar.display-lg-none.my-2
         .container-fluid
-          button.navbar-toggler(id='toggleButton', style="border: none", type='button', data-bs-toggle='collapse', data-bs-target='#searchbar', aria-controls='searchbar', aria-expanded='false', aria-label='Toggle navigation')
+          button#toggleButton.navbar-toggler(style="border: none", type='button', data-bs-toggle='collapse', data-bs-target='#filters', aria-controls='filters', aria-expanded='false', aria-label='Toggle filters')
             span.fas.fa-filter
-            - var filterMessage = showFilters ? "Hide filters" : "Show filters"
-            h5#filterMessage.d-inline.ms-3 #{filterMessage}
-          #searchbar.collapse.navbar-collapse
+            h5#filterMessage.d-inline.ms-3 Show filters
+          #filters.collapse.navbar-collapse
             .pt-4.px-4
               +filterBlock
               hr.mb-5
               
-      .col-12.mb-5.col-lg-3.mb-lg-0.hideOnMobile
+      .col-12.mb-5.col-lg-3.mb-lg-0.display-lg-block
         .border
           .p-3
             +filterBlock
@@ -91,6 +91,7 @@ block content
           h4 Viewing buildings standing in #{secondQuery}
         else 
           h4 Viewing all buildings
+
         table.table.table-hover
           thead
             tr
@@ -110,21 +111,22 @@ block content
                   a.dropdown-item(href=url) Oldest
               th(scope='col').col-1
                 a.nav-link.dropdown-toggle(data-bs-toggle='dropdown' href='#' role='button' aria-haspopup='true' aria-expanded='false') 
-                  span.hideOnMobile Destroyed
-                  span.onlyOnMobile Dest.
+                  span.display-lg-block Destroyed
+                  span.display-lg-none Dest.
                 .dropdown-menu
                   - url = previousFilter ? "/buildings/sortedByYearDestroyed/most-recent/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
                   a.dropdown-item(href=url) Most Recent
                   - url = previousFilter ? "/buildings/sortedByYearDestroyed/oldest/" + previousFilter : "/buildings/sortedByYearDestroyed/most-recent/"
                   a.dropdown-item(href=url) Oldest
               th(scope='col').col-5.col-lg-3 Address
-              th(scope='col').col-lg-4.hideOnMobile Address Description
+              th(scope='col').col-lg-4.display-lg-block Address Description
+
           each building in buildings 
-            - var url = '/profile/' + building.name
+            - url = '/profile/' + building.name
             tr.table-secondary
               th(scope='row') 
                 a(href=url) #{building.name}
               td #{building.year_built}
               td #{building.year_destroyed}
               td #{building.address}
-              td.hideOnMobile #{building.address_description}
+              td.display-lg-block #{building.address_description}
