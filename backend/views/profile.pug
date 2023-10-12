@@ -62,89 +62,90 @@ block content
     }
     
   if building
-    .container-lg.d-flex.flex-column.gap-3
-      .row.d-flex
-        .col-lg-6.col-12.first-column
-          if images.length > 1
-            section#mainSplide.splide(aria-label='Building images carousel')
-              .splide__track
-                ul.splide__list
-                  each image in images
-                    li.splide__slide.d-flex.flex-column.gap-2.justify-content-center.align-items-center
-                      a.w-100(href=image.url) 
-                        img.w-100(src=image.url)
-                      .mb-3.d-flex.flex-column.justify-content-center.align-items-center
-                        if image.caption
-                          span(style="text-align: justify") #{image.caption}
-                        if image.year_taken 
-                          span.mx-auto #{image.year_taken}
-          else if images.length == 1
-            .d-flex.flex-column.justify-content-center.align-items-center.individual-img
-              a(href=images[0].url)
-                img.individual_img(src=images[0].url)
-              .my-2.d-flex.flex-column.justify-content-center.align-items-center
-                if images[0].caption
-                  span(style="text-align: justify") #{images[0].caption}
-                if images[0].year_taken 
-                  span.mx-auto #{images[0].year_taken}
-          else 
-            div.h-100.border.d-flex.justify-content-center.align-items-center 
-              span No image available
-        hr.py-2.only-mobile
-        .col-lg-6.col-12.d-flex.flex-column.align-items-center.align-items-lg-start.justify-content-between.second-column
-          if building
-            .info
-              h1 #{building.name}
-              h5 #{building.address_description}
-              h5 #{building.address}
-              if building.address || building.address_description
-                br 
-              h5 Built in #{building.year_built}
-              if building.year_destroyed
-                h5 Destroyed in #{building.year_destroyed}
-            hr.w-100.only-mobile
-            if building.maps_link
-              br
-              iframe.map(src=building.maps_link, width='100%', height='100%', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
-      hr
-      - var preceded_by = building.preceded_by ? building.preceded_by : null
-      - var succeeded_by = building.succeeded_by ? building.succeeded_by : null 
-      .d-flex.justify-content-between
-        .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
-          h5 Preceded by <br>
-            if preceded_by !== null
-              a.fs-5(href=`/profile/${preceded_by}`) #{preceded_by}
-            else 
-              | ???
-        .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
-          h5.text-center Succeeded by <br>
-            if succeeded_by !== null
-              a.fs-5(href=`/profile/${succeeded_by}`) #{succeeded_by}
-            else 
-              | ???
-      if building.description
-        hr
+    .mx-4.my-4
+      .container-lg.d-flex.flex-column.gap-3
         .row.d-flex
-          div !{building.description}
-      hr
-      h5.ps-4 Sources used on this page
-      - var className
-      #accordionExample.accordion.mb-5
-        each resource_array, source in resources
-          .accordion-item
-            h2#headingOne.accordion-header
-              - className = source.split(' ').join('_')
-              button.accordion-button.collapsed(type='button' data-bs-toggle='collapse' data-bs-target=`#collapse${className}` aria-expanded='false' aria-controls=`collapse${className}`)
-                | #{source}
-            .accordion-collapse.collapse(id=`collapse${className}` aria-labelledby='headingOne' data-bs-parent='#accordionExample')
-              .accordion-body
-                - var title
-                ul.m-0
-                each item in resource_array
-                  - title = item.title ? item.title : item.caption ? item.caption : item.source
-                  //- - title = title.split(' ').length === 1 ? title.slice(0, 45) + " ..." : title
-                  li.my-3(style="overflow-wrap: break-word; list-style-type: none")
-                    span.me-3 &bull;
-                    a(href=item.source) #{title}
+          .col-lg-6.col-12.first-column
+            if images.length > 1
+              section#mainSplide.splide(aria-label='Building images carousel')
+                .splide__track
+                  ul.splide__list
+                    each image in images
+                      li.splide__slide.d-flex.flex-column.gap-2.justify-content-center.align-items-center
+                        a.w-100(href=image.url) 
+                          img.w-100(src=image.url)
+                        .mb-3.d-flex.flex-column.justify-content-center.align-items-center
+                          if image.caption
+                            span(style="text-align: justify") #{image.caption}
+                          if image.year_taken 
+                            span.mx-auto #{image.year_taken}
+            else if images.length == 1
+              .d-flex.flex-column.justify-content-center.align-items-center.individual-img
+                a(href=images[0].url)
+                  img.individual_img(src=images[0].url)
+                .my-2.d-flex.flex-column.justify-content-center.align-items-center
+                  if images[0].caption
+                    span(style="text-align: justify") #{images[0].caption}
+                  if images[0].year_taken 
+                    span.mx-auto #{images[0].year_taken}
+            else 
+              div.h-100.border.d-flex.justify-content-center.align-items-center 
+                span No image available
+          hr.py-2.only-mobile
+          .col-lg-6.col-12.d-flex.flex-column.align-items-center.align-items-lg-start.justify-content-between.second-column
+            if building
+              .info
+                h1 #{building.name}
+                h5 #{building.address_description}
+                h5 #{building.address}
+                if building.address || building.address_description
+                  br 
+                h5 Built in #{building.year_built}
+                if building.year_destroyed
+                  h5 Destroyed in #{building.year_destroyed}
+              hr.w-100.only-mobile
+              if building.maps_link
+                br
+                iframe.map(src=building.maps_link, width='100%', height='100%', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
+        hr
+        - var preceded_by = building.preceded_by ? building.preceded_by : null
+        - var succeeded_by = building.succeeded_by ? building.succeeded_by : null 
+        .d-flex.justify-content-between
+          .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
+            h5 Preceded by <br>
+              if preceded_by !== null
+                a.h5(href=`/profile/${preceded_by}`) #{preceded_by}
+              else 
+                | ???
+          .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
+            h5.text-center Succeeded by <br>
+              if succeeded_by !== null
+                a.h5(href=`/profile/${succeeded_by}`) #{succeeded_by}
+              else 
+                | ???
+        if building.description
+          hr
+          .row.d-flex
+            div !{building.description}
+        hr
+        h5.ps-4 Sources used on this page
+        - var className
+        #accordionExample.accordion.mb-5
+          each resource_array, source in resources
+            .accordion-item
+              h2#headingOne.accordion-header
+                - className = source.split(' ').join('_')
+                button.accordion-button.collapsed(type='button' data-bs-toggle='collapse' data-bs-target=`#collapse${className}` aria-expanded='false' aria-controls=`collapse${className}`)
+                  | #{source}
+              .accordion-collapse.collapse(id=`collapse${className}` aria-labelledby='headingOne' data-bs-parent='#accordionExample')
+                .accordion-body
+                  - var title
+                  ul.m-0
+                  each item in resource_array
+                    - title = item.title ? item.title : item.caption ? item.caption : item.source
+                    //- - title = title.split(' ').length === 1 ? title.slice(0, 45) + " ..." : title
+                    li.my-3(style="overflow-wrap: break-word; list-style-type: none")
+                      span.me-3 &bull;
+                      a(href=item.source) #{title}
   else 
     h1 Not found.

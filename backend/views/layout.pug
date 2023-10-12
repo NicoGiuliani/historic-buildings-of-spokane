@@ -4,6 +4,31 @@ style.
       font-size: 1.4rem !important;
     }
   }
+  /* Hide the default scrollbar */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  /* Track (the area behind the thumb) */
+  ::-webkit-scrollbar-track {
+    background: transparent; /* You can set a background color here if desired */
+  }
+
+  /* Thumb (the draggable part) */
+  ::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the thumb */
+  }
+
+  /* Handle the corner where two scrollbars meet */
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Resize the content to accommodate the scrollbar width */
+  body {
+    margin-right: 12px; /* Width of the scrollbar */
+    overflow-y: scroll; /* Always show scrollbar */
+  }
 
 doctype html
 html(lang="en")
@@ -20,17 +45,17 @@ html(lang="en")
         a.navbar-brand(href='/') Historic Buildings of Spokane
         button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarColor03', aria-controls='navbarColor03', aria-expanded='false', aria-label='Toggle navigation')
           span.navbar-toggler-icon
-        #navbarColor03.collapse.navbar-collapse
-          ul.navbar-nav.me-auto.px-4
+        #navbarColor03.collapse.navbar-collapse.px-4.px-lg-0
+          ul.navbar-nav.me-auto
             li.nav-item.my-3
               a.nav-link(href='/buildings') Buildings
           form.d-flex.my-auto(action='/search', method='get')
             input.form-control.me-sm-2(type='search', name='query', placeholder='Search')
             button.btn.btn-secondary.my-2.my-sm-0(type='submit') 
               i.fas.fa-search
-    .my-3.mx-4
-      block content
-    .d-flex.justify-content-center(style="margin-top: auto;")
+              
+    block content
+    .d-flex.justify-content-center.pt-3.pt-lg-0(style="margin-top: auto;")
       h5 Copyright © 2023 Nico Julian
   script(src="/node_modules/@splidejs/splide/dist/js/splide.min.js")
   script. 
