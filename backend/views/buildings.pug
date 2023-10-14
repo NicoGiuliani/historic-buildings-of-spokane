@@ -11,12 +11,12 @@ mixin startYearEndYearInputs
 mixin filterBlock 
   p Search by keyword
   form.d-flex.my-auto(action='/search', method='get')
-    input.form-control.me-sm-2(type='search', name='query', placeholder='Search')
+    input.form-control.me-sm-2(required, type='search', name='query', placeholder='Search')
     +filterSubmitButton
   hr
   p View buildings in a specific year
   form.d-flex(action='/buildings/existingInYear', method='get')
-    input.form-control.me-sm-2(type='number', name='query', placeholder='Year', max=currentYear)
+    input.form-control.me-sm-2(required, type='number', name='query', placeholder='Year', max=currentYear)
     +filterSubmitButton
   hr
   p View buildings built between 

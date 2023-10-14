@@ -2,6 +2,26 @@ extends layout.pug
 
 block content
   style. 
+    @media screen and (max-width: 992px) {
+      #mainSplide .splide__arrow--prev,
+      #mainSplide .splide__arrow--next {
+        display: none;
+      }
+      .splide__slide img,
+      .individual_img {
+        max-height: 30vh;
+        max-width: 100%;
+        object-fit: contain;
+      }
+      .splide__pagination {
+        padding: 35px;
+        bottom: 85px;
+      }
+      .info {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+    }
     @media screen and (min-width: 992px) {
       #mainSplide .splide__arrow--prev {
         left: -50px;
@@ -22,20 +42,8 @@ block content
         min-height: 325px;
          max-width: 450px;
       }
-      .only-mobile {
+      .display-lg-none {
         display: none;
-      }
-    }
-    @media screen and (max-width: 992px) {
-      #mainSplide .splide__arrow--prev,
-      #mainSplide .splide__arrow--next {
-        display: none;
-      }
-      .splide__slide img,
-      .individual_img {
-        max-height: 30vh;
-        max-width: 100%;
-        object-fit: contain;
       }
     }
     .first-column {
@@ -44,28 +52,18 @@ block content
     .second-column {
       min-height: 50vh;
     }
-    button.is-active {
-      background-color: black !important;
-    }
     .splide__pagination {
       position: relative;
     }
-    @media screen and (max-width: 992px) {
-      .splide__pagination {
-        padding: 35px;
-        bottom: 85px;
-      }
-      .info {
-        text-align: center;
-        margin-bottom: 25px;
-      }
+    button.is-active {
+      background-color: black !important;
     }
     
   if building
-    .mx-4.my-4
+    .m-4
       .container-lg.d-flex.flex-column.gap-3
         .row.d-flex
-          .col-lg-6.col-12.first-column
+          .col-12.col-lg-6.first-column
             if images.length > 1
               section#mainSplide.splide(aria-label='Building images carousel')
                 .splide__track
@@ -91,8 +89,8 @@ block content
             else 
               div.h-100.border.d-flex.justify-content-center.align-items-center 
                 span No image available
-          hr.py-2.only-mobile
-          .col-lg-6.col-12.d-flex.flex-column.align-items-center.align-items-lg-start.justify-content-between.second-column
+          hr.py-2.display-lg-none
+          .col-12.col-lg-6.d-flex.flex-column.align-items-center.align-items-lg-start.justify-content-between.second-column
             if building
               .info
                 h1 #{building.name}
@@ -103,7 +101,7 @@ block content
                 h5 Built in #{building.year_built}
                 if building.year_destroyed
                   h5 Destroyed in #{building.year_destroyed}
-              hr.w-100.only-mobile
+              hr.w-100.display-lg-none
               if building.maps_link
                 br
                 iframe.map(src=building.maps_link, width='100%', height='100%', style='border:0', allowfullscreen='', loading='lazy', referrerpolicy='no-referrer-when-downgrade')
@@ -143,9 +141,8 @@ block content
                   ul.m-0
                   each item in resource_array
                     - title = item.title ? item.title : item.caption ? item.caption : item.source
-                    //- - title = title.split(' ').length === 1 ? title.slice(0, 45) + " ..." : title
                     li.my-3(style="overflow-wrap: break-word; list-style-type: none")
                       span.me-3 &bull;
                       a(href=item.source) #{title}
   else 
-    h1 Not found.
+    h1 Not found

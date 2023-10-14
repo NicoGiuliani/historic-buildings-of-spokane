@@ -1,6 +1,25 @@
 extends layout.pug
 
 block content
-  div(style=("background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.8)), url('/IMG_0450.JPG'); background-repeat: no-repeat; height: 100vh; background-position: center; background-size: cover"))
-    .container-lg.my-4.px-4
-      h1 Welcome! This is a site to view the buildings of Spokane's past.
+  style. 
+    #homepage-background {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.8)), url('/IMG_0450.JPG'); 
+      background-repeat: no-repeat;
+      height: 88vh; 
+      background-position: top; 
+      background-size: cover;
+    }
+    @media screen and (max-width: 992px) {
+      #homepage-background {
+        height: 100vh;
+      }
+    }
+
+  #homepage-background
+    .container.mt-5.d-flex.flex-column.gap-3.p-4.justify-content-start.align-items-center(style="height: auto")
+      h1 Welcome
+      h5.text-center This is a place to view the historic buildings of Spokane 
+      p.text-center The intent of this site is to bring together information from various sources in order to create an easy to view directory of Spokane's historic structures.
+        |  Buildings can be searched by name, year built, year destroyed, or street name.
+        |  Browse the entire list of buildings, or see which were standing in a certain year using filters.
+      a.btn.btn-lg.btn-dark(type="button", href="/buildings") View Historic Spokane Buildings
