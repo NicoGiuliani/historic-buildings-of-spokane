@@ -1,20 +1,31 @@
 import express from "express";
-import { PORT } from './config.js';
+import bodyParser from 'body-parser';
 import path from 'path';
 import pool from "./db/connection.js";
 import * as url from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
+const port = process.env.PORT || 3000;
+
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static('node_modules'));
 app.set("views", path.join(__dirname, 'views'));
 app.set("view engine", "pug");
 
-app.listen(PORT, () => {
-  console.log(`App is listening on port: ${PORT}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`App is listening on port: ${port}`);
 });
 
 app.get('/', async (request, response) => {
@@ -25,20 +36,21 @@ app.get('/search', async (request, response) => {
   const keyword = request.query.query;
   let message = 'Results for "' + keyword + '"'
   const sqlQuery = 
-    `SELECT * FROM spokane.buildings 
-    WHERE name LIKE '%${keyword}%'
-    OR year_built LIKE '%${keyword}%'
-    OR year_destroyed LIKE '%${keyword}%'
-    OR address LIKE '%${keyword}%'
-    OR address_description LIKE '%${keyword}%'
-    ORDER BY name;`
+  `SELECT * FROM buildings 
+  WHERE name ILIKE '%${keyword}%'
+  OR CAST(year_built AS TEXT) ILIKE '%${keyword}%'
+  OR CAST(year_destroyed AS TEXT) ILIKE '%${keyword}%'
+  OR address ILIKE '%${keyword}%'
+  OR address_description ILIKE '%${keyword}%'
+  ORDER BY name;`
   try {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error);
       }
       let previousFilter = request.url.split('/')[1];
-      response.render('buildings', { buildings: result, message: message, previousFilter: previousFilter });
+      console.log(result);
+      response.render('buildings', { buildings: result['rows'], message: message, previousFilter: previousFilter });
     });
   } catch (error) {
     console.log(error);
@@ -50,18 +62,19 @@ app.get('/profile/:buildingName', async (request, response) => {
   const buildingQuery = `
     SELECT buildings.id, name, year_built, year_destroyed, address, 
     address_description, description, maps_link, preceded_by, succeeded_by
-    FROM spokane.buildings WHERE name = ?;`
+    FROM buildings WHERE name = $1;`
   const resourceQuery = `
-    SELECT url, caption, image_index, year_taken, source, source_name FROM spokane.resources WHERE building = ? ORDER BY image_index;`
+    SELECT url, caption, image_index, year_taken, source, source_name FROM resources WHERE building = $1 ORDER BY image_index;`
   const newspaperQuery = `
-    SELECT date, source, source_name, title FROM spokane.newspapers WHERE building = ?;`
+    SELECT date, source, source_name, title FROM newspapers WHERE building = $1;`
     
+
   const buildingResult = await new Promise((resolve, reject) => {
     pool.query(buildingQuery, [buildingName], (error, result) => {
       if (error) {
         reject(error);
       } else {
-        resolve(result[0]);
+        resolve(result);
       }
     });
   })   
@@ -87,7 +100,7 @@ app.get('/profile/:buildingName', async (request, response) => {
   })
 
   let resources = {};
-  resourceResult.forEach(resource => {
+  resourceResult['rows'].forEach(resource => {
     if (!(resource.source_name in resources)) {
       resources[resource.source_name] = [resource];
     } else {
@@ -95,15 +108,15 @@ app.get('/profile/:buildingName', async (request, response) => {
     }
   })
 
-  newspaperResult.forEach(newspaper => {
+  newspaperResult['rows'].forEach(newspaper => {
     if (!(newspaper.source_name in resources)) {
       resources[newspaper.source_name] = [newspaper];
     } else {
       resources[newspaper.source_name].push(newspaper);
     }
   })
-  
-  response.render("profile", { building: buildingResult, images: resourceResult, resources: resources });
+
+  response.render("profile", { building: buildingResult['rows'][0], images: resourceResult['rows'], resources: resources });
 });
   
 app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response) => {
@@ -199,7 +212,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         previousFilter = request.url.split('/')[2];
         message = "Viewing buildings standing in " + keyword;
         sqlQuery = 
-          `SELECT * FROM spokane.buildings 
+          `SELECT * FROM buildings 
           WHERE ${keyword} >= year_built 
           AND (${keyword} <= year_destroyed 
           OR year_destroyed IS NULL) 
@@ -211,7 +224,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         endYear = request.query.endYear;
         message = "Viewing buildings built between " + startYear + " & " + endYear;
         sqlQuery = 
-          `SELECT * FROM spokane.buildings 
+          `SELECT * FROM buildings 
           WHERE ${startYear} <= year_built 
           AND ${endYear} >= year_built
           ORDER BY name;`
@@ -222,7 +235,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         endYear = request.query.endYear;
         message = "Viewing buildings destroyed between " + startYear + " & " + endYear;
         sqlQuery = 
-          `SELECT * FROM spokane.buildings 
+          `SELECT * FROM buildings 
           WHERE ${startYear} <= year_destroyed 
           AND ${endYear} >= year_destroyed
           ORDER BY name;`
@@ -242,9 +255,9 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         resolve(result);
       }
     });
-  })   
+  })
 
-  return response.render("buildings", {buildings: result, message: message, previousFilter: previousFilter, secondQuery: secondQuery});
+  return response.render("buildings", {buildings: result["rows"], message: message, previousFilter: previousFilter, secondQuery: secondQuery});
 });
 
 app.post('/buildings', async (request, response) => {
@@ -262,7 +275,7 @@ app.post('/buildings', async (request, response) => {
       year_built: request.body.year_built,
       year_destroyed: request.body.year_destroyed || null,
     }
-    pool.query('INSERT INTO buildings (name, year_built, year_destroyed) VALUES (?, ?, ?)', 
+    pool.query('INSERT INTO buildings (name, year_built, year_destroyed) VALUES ($1, $2, $3)', 
     [building.name, building.year_built, building.year_destroyed], 
     (error, result) => {
       if (error) {
@@ -291,7 +304,7 @@ app.post('/resources', async (request, response) => {
       building: request.body.building,
       url: request.body.url,
     }
-    pool.query('INSERT INTO resources (building, url) VALUES (?, ?)', 
+    pool.query('INSERT INTO resources (building, url) VALUES ($1, $2)', 
     [resource.building, resource.url], 
     (error, result) => {
       if (error) {
