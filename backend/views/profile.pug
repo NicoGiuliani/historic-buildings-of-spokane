@@ -145,4 +145,11 @@ block content
                       span.me-3 &bull;
                       a(href=item.source) #{title}
   else 
-    h1 Not found
+    .container.p-4
+      h1 Page not found
+
+  script. 
+    new Splide( '#mainSplide', {
+      type      : 'loop',
+      gap       : '50px',
+    }).mount();
