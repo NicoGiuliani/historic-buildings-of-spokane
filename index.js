@@ -12,6 +12,8 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const port = process.env.PORT || 3000;
 
+console.log("check this out:", process.env.PGUSER)
+
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
