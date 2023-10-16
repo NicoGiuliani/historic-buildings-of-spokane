@@ -12,7 +12,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const port = 3000;
 
-console.log("check this out:", process.env.PGUSER)
+console.log("env:", process.env.PGUSER)
 
 app.use(bodyParser.json())
 app.use(

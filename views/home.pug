@@ -5,7 +5,8 @@ block content
     #homepage-background {
       background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.8)), url('/IMG_0450.JPG'); 
       background-repeat: no-repeat;
-      height: 88vh; 
+      min-height: 90vh; 
+      max-height: fit-content;
       background-position: top; 
       background-size: cover;
     }
@@ -14,9 +15,14 @@ block content
         height: 100vh;
       }
     }
+    @media screen and (orientation: landscape) and (max-device-width: 1000px) {
+      #homepage-background {
+        height: fit-content;
+      }
+    }
 
   #homepage-background
-    .container.mt-5.d-flex.flex-column.gap-3.p-4.justify-content-start.align-items-center(style="height: auto")
+    .container.mt-5.d-flex.flex-column.gap-3.p-4.justify-content-start.align-items-center(style="height: auto;")
       h1 Welcome
       h5.text-center This is a place to view the historic buildings of Spokane 
       p.text-center The intent of this site is to bring together information from various sources in order to create an easy to view directory of Spokane's historic structures.

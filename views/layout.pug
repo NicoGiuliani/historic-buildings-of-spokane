@@ -1,19 +1,12 @@
 style. 
-  #mainNav {
-    height: 12vh;
-  }
-  #mainFooter {
-    height: 6vh;
-  }
-  @media screen and (max-width: 992px) {
+  @media screen and (max-width: 992px) and (max-device-width: 1000px) {
     * {
       font-size: 1.4rem !important;
     }
-    #mainNav {
-      height: initial;
-    }
-    #mainFooter {
-      height: 4vh;
+  }
+  @media screen and (orientation: landscape) and (max-device-width: 1000px) {
+    * {
+      font-size: 1rem !important;
     }
   }
   /* Hide the default scrollbar */
@@ -65,7 +58,7 @@ html(lang="en")
               
     block content
 
-    #mainFooter.d-flex.justify-content-center.align-items-center(style="margin-top: auto;")
+    #mainFooter.d-flex.justify-content-center.align-items-center.p-2(style="margin-top: auto; height: fit-content")
       h5.m-0 Copyright © 2023 Nico Giuliani
 
     script(src="/node_modules/@splidejs/splide/dist/js/splide.min.js")
