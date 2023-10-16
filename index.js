@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 console.log("check this out:", process.env.PGUSER)
 
