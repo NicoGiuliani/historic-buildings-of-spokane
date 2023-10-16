@@ -1,8 +1,14 @@
 import pg from "pg";
+import fs from 'fs';
 // import dotenv from 'dotenv';
 // dotenv.config();
 
 const Pool = pg.Pool
+
+const sslConfig = { 
+  rejectUnauthorized: true,
+  ca: fs.readFileSync(process.env.CERTAUTH),
+}
 
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -10,6 +16,7 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
+  ssl: sslConfig
 });
 
 export default pool;
