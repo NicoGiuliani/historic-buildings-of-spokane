@@ -6,7 +6,7 @@ dotenv.config();
 const Pool = pg.Pool
 
 const sslConfig = { 
-  rejectUnauthorized: false,
+  rejectUnauthorized: true,
   ca: fs.readFileSync(process.env.CERTAUTH),
 }
 
