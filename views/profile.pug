@@ -152,7 +152,7 @@ block content
           each resource_array, source in resources
             .accordion-item
               h2#headingOne.accordion-header
-                - className = source.split(' ').join('_')
+                - className = source.replace(/[\W_]+/g," ").split(' ').join('_')
                 button.accordion-button.collapsed(type='button' data-bs-toggle='collapse' data-bs-target=`#collapse${className}` aria-expanded='false' aria-controls=`collapse${className}`)
                   | #{source}
               .accordion-collapse.collapse(id=`collapse${className}` aria-labelledby='headingOne' data-bs-parent='#accordionExample')
