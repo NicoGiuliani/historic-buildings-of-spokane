@@ -95,7 +95,7 @@ block content
                         .mb-3.d-flex.flex-column.justify-content-center.align-items-center
                           if image.caption
                             span(style="text-align: justify") #{image.caption}
-                          if image.year_taken 
+                          if image.year_taken !== 'NULL'
                             span.mx-auto #{image.year_taken}
             else if images.length == 1
               .d-flex.flex-column.justify-content-center.align-items-center.individual-img
