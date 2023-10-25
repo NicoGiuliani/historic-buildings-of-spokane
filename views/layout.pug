@@ -1,3 +1,5 @@
+script. 
+  const currentYear = (new Date()).getFullYear();
 style. 
   @media screen and (max-width: 992px) and (max-device-width: 1000px) {
     * {
@@ -59,6 +61,6 @@ html(lang="en")
     block content
 
     #mainFooter.d-flex.flex-column.justify-content-center.align-items-center.p-2(style="margin-top: auto; height: fit-content")
-      h5.m-0 Copyright © 2023 Nico Giuliani
+      h5.m-0 Copyright © #{currentYear} Nico Julian
 
     script(src="/node_modules/@splidejs/splide/dist/js/splide.min.js")
