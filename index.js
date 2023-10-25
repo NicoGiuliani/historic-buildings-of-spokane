@@ -63,7 +63,7 @@ app.get('/profile/:buildingName', async (request, response) => {
   const buildingName = request.params['buildingName'];
   const buildingQuery = `
     SELECT buildings.id, name, year_built, year_destroyed, address, 
-    address_description, description, maps_link, preceded_by, succeeded_by
+    address_description, description, maps_link, preceded_by, succeeded_by, preceded_link, succeeded_link
     FROM buildings WHERE name = $1;`
   const resourceQuery = `
     SELECT url, caption, image_index, year_taken, source, source_name FROM resources WHERE building = $1 ORDER BY image_index, id;`

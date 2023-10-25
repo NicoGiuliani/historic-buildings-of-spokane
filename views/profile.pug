@@ -132,13 +132,19 @@ block content
           .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
             h5 Preceded by <br>
               if preceded_by !== null
-                a.h5(href=`/profile/${preceded_by}`) #{preceded_by}
+                if building.preceded_link === true
+                  a.h5(href=`/profile/${preceded_by}`) #{preceded_by}
+                else 
+                  h5 #{preceded_by}
               else 
                 | ???
           .d-flex.flex-column.col-6.justify-content-center.align-items-center.text-center
             h5.text-center Succeeded by <br>
               if succeeded_by !== null
-                a.h5(href=`/profile/${succeeded_by}`) #{succeeded_by}
+                if building.succeeded_link === true
+                  a.h5(href=`/profile/${succeeded_by}`) #{succeeded_by}
+                else 
+                  h5 #{succeeded_by}
               else 
                 | ???
         if building.description
