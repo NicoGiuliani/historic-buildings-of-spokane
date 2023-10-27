@@ -12,8 +12,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const port = 3000;
 
-console.log("env:", process.env.PGUSER)
-
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
@@ -51,7 +49,6 @@ app.get('/search', async (request, response) => {
         console.log(error);
       }
       let previousFilter = request.url.split('/')[1];
-      console.log(result);
       response.render('buildings', { buildings: result['rows'], message: message, previousFilter: previousFilter });
     });
   } catch (error) {
@@ -144,12 +141,12 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
     }
     else if (filterName === 'search') {
       secondQuery = previousFilter.split('?')[1].split('=')[1];
-      sqlQuery += 
-        `WHERE name LIKE '%${secondQuery}%'
-        OR year_built LIKE '%${secondQuery}%'
-        OR year_destroyed LIKE '%${secondQuery}%'
-        OR address LIKE '%${secondQuery}%'
-        OR address_description LIKE '%${secondQuery}%' `
+      sqlQuery +=
+        `WHERE name ILIKE '%${secondQuery}%'
+        OR CAST(year_built AS TEXT) ILIKE '%${secondQuery}%'
+        OR CAST(year_destroyed AS TEXT) ILIKE '%${secondQuery}%'
+        OR address ILIKE '%${secondQuery}%'
+        OR address_description ILIKE '%${secondQuery}%' `
       message = 'Results for "' + secondQuery + '"'
     }
     else if (filterName === 'builtBetween') {
