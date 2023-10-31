@@ -33,7 +33,7 @@ app.get('/', async (request, response) => {
 });
 
 app.get('/search', async (request, response) => {
-  const keyword = request.query.query;
+  const keyword = request.query.query.replace(/'/g, '');
   let message = 'Results for "' + keyword + '"'
   const sqlQuery = 
   `SELECT * FROM buildings 
