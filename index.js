@@ -167,6 +167,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
     }
     else {
       console.log("An error has occurred in applySecondFilter");
+      message = "An invalid filter has been applied. Click 'Buildings' to return to the historic buildings list."
     }
   }
   
@@ -174,7 +175,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
     switch (filter) {
       case ("sortedByName"):
         sqlQuery = `SELECT * FROM buildings `
-        if ('secondFilter' in request.params) {
+        if (request.params['secondFilter'] !== undefined) {
           applySecondFilter();
         }
         if (method === "z-a") {
@@ -185,7 +186,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         break;
       case ("sortedByYearBuilt"):
         sqlQuery = `SELECT * FROM buildings `
-        if ('secondFilter' in request.params) {
+        if (request.params['secondFilter'] !== undefined) {
           applySecondFilter();
         }
         if (method === "most-recent") {
@@ -196,7 +197,7 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
         break;
       case ("sortedByYearDestroyed"):
         sqlQuery = `SELECT * FROM buildings `
-        if ('secondFilter' in request.params) {
+        if (request.params['secondFilter'] !== undefined) {
           applySecondFilter();
         }
         if (method === "most-recent") {
@@ -240,6 +241,8 @@ app.get('/buildings/:filter?/:method?/:secondFilter?', async (request, response)
           ORDER BY name;`
         break;
       default:
+        sqlQuery = `SELECT * FROM buildings WHERE name = 'invalidEntry';`
+        message = "An invalid filter has been applied. Click 'Buildings' to return to the historic buildings list."
         break;
     }
   } else {
